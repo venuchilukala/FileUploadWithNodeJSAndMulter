@@ -1,10 +1,22 @@
 const express = require('express')
 const path = require('path')
 const multer  = require('multer')
-const upload = multer({ dest: 'uploads/' })
+
 
 const app = express()
 const PORT = 8002 
+
+const storage = multer.diskStorage({
+    destination : function (req, file, cb){
+        return cb(null, './uploads')
+    },
+    filename : function (req, file, cb){
+        return cb(null, `${Date.now()}-${file.originalname}`)
+    }
+
+})
+const upload = multer({storage})
+// const upload = multer({ dest: 'uploads/' })
 
 app.set("view engine", "ejs")
 app.set("views", path.resolve('./views'))
@@ -22,19 +34,8 @@ app.post('/upload', upload.single("profileImage") ,(req, res)=>{
     return res.redirect('/')
 })
 
-/* 
-re.file :->>>>>>>>>>
-    {
-    fieldname: 'profileImage',
-    originalname: 'profile-pic.png',
-    encoding: '7bit',
-    mimetype: 'image/png',
-    destination: 'uploads/',
-    filename: 'ff01eb1f7cedbc9d0537221863fb82cc',
-    path: 'uploads\\ff01eb1f7cedbc9d0537221863fb82cc',
-    size: 381977
-    }
-*/
+// upload.fields([{name : "profileImage" , name : "coverImage"}])  :----> For multiple images upload
+
 
 app.listen(PORT, ()=>{
     console.log(`Server Started at : http://localhost:8002`)
